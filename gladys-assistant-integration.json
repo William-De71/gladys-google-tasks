@@ -1,0 +1,1304 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Google Tasks",
+  "description": {
+    "en": "Your Google Tasks lists in Gladys: counters, widgets to add and complete tasks, scenes.",
+    "fr": "Vos listes Google Tasks dans Gladys : compteurs, widgets pour ajouter et terminer, scènes.",
+    "de": "Deine Google-Tasks-Listen in Gladys: Zähler, Widgets zum Hinzufügen und Erledigen, Szenen.",
+    "es": "Tus listas de Google Tasks en Gladys: contadores, widgets para añadir y completar, escenas."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/william-de71/gladys-google-tasks:0.1.0",
+  "gladys_version": ">=5.2.0",
+  "categories": ["services"],
+  "cover_image": "https://raw.githubusercontent.com/William-De71/gladys-google-tasks/main/cover.jpg",
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "1. Your Google Cloud OAuth client",
+        "fr": "1. Votre client OAuth Google Cloud",
+        "de": "1. Dein Google-Cloud-OAuth-Client",
+        "es": "1. Tu cliente OAuth de Google Cloud"
+      },
+      "description": {
+        "en": "Google gives no shared key: create a free project in the Google Cloud console, enable the Google Tasks API, configure the consent screen (External) and publish it \"In production\", then create an OAuth client of type \"Web application\" whose authorized redirect URI is exactly https://my.gladysassistant.com/redirect/oauth. The documentation details every step.",
+        "fr": "Google ne fournit pas de clé partagée : créez un projet gratuit dans la console Google Cloud, activez l’API Google Tasks, configurez l’écran de consentement (Externe) et publiez-le « En production », puis créez un client OAuth de type « Application Web » dont l’URI de redirection autorisée est exactement https://my.gladysassistant.com/redirect/oauth. La documentation détaille chaque étape.",
+        "de": "Google stellt keinen gemeinsamen Schlüssel bereit: Lege in der Google-Cloud-Konsole ein kostenloses Projekt an, aktiviere die Google Tasks API, richte den Zustimmungsbildschirm (Extern) ein und veröffentliche ihn „In Produktion“. Erstelle dann einen OAuth-Client vom Typ „Webanwendung“ mit genau dieser autorisierten Weiterleitungs-URI: https://my.gladysassistant.com/redirect/oauth. Die Dokumentation beschreibt jeden Schritt.",
+        "es": "Google no ofrece una clave compartida: crea un proyecto gratuito en la consola de Google Cloud, activa la API de Google Tasks, configura la pantalla de consentimiento (Externo) y publícala «En producción», y crea un cliente OAuth de tipo «Aplicación web» cuyo URI de redireccionamiento autorizado sea exactamente https://my.gladysassistant.com/redirect/oauth. La documentación detalla cada paso."
+      },
+      "links": [
+        {
+          "url": "https://console.cloud.google.com/apis/library/tasks.googleapis.com",
+          "label": {
+            "en": "Enable the Google Tasks API",
+            "fr": "Activer l’API Google Tasks",
+            "de": "Google Tasks API aktivieren",
+            "es": "Activar la API de Google Tasks"
+          }
+        },
+        {
+          "url": "https://console.cloud.google.com/auth/clients",
+          "label": {
+            "en": "OAuth clients",
+            "fr": "Clients OAuth",
+            "de": "OAuth-Clients",
+            "es": "Clientes OAuth"
+          }
+        },
+        {
+          "url": "https://github.com/William-De71/gladys-google-tasks/blob/main/docs/en.md",
+          "label": {
+            "en": "Step-by-step guide",
+            "fr": "Guide pas à pas",
+            "de": "Schritt-für-Schritt-Anleitung",
+            "es": "Guía paso a paso"
+          }
+        }
+      ]
+    },
+    {
+      "key": "client_id",
+      "type": "string",
+      "label": {
+        "en": "Client ID",
+        "fr": "Client ID",
+        "de": "Client-ID",
+        "es": "Client ID"
+      },
+      "description": {
+        "en": "Ends with .apps.googleusercontent.com.",
+        "fr": "Se termine par .apps.googleusercontent.com.",
+        "de": "Endet auf .apps.googleusercontent.com.",
+        "es": "Termina en .apps.googleusercontent.com."
+      },
+      "placeholder": {
+        "en": "123456789012-abc.apps.googleusercontent.com",
+        "fr": "123456789012-abc.apps.googleusercontent.com",
+        "de": "123456789012-abc.apps.googleusercontent.com",
+        "es": "123456789012-abc.apps.googleusercontent.com"
+      },
+      "required": true
+    },
+    {
+      "key": "client_secret",
+      "type": "secret",
+      "label": {
+        "en": "Client secret",
+        "fr": "Client secret",
+        "de": "Clientschlüssel",
+        "es": "Client secret"
+      },
+      "description": {
+        "en": "Shown by Google when the client is created (it starts with GOCSPX-).",
+        "fr": "Affiché par Google à la création du client (il commence par GOCSPX-).",
+        "de": "Wird von Google beim Erstellen des Clients angezeigt (beginnt mit GOCSPX-).",
+        "es": "Google lo muestra al crear el cliente (empieza por GOCSPX-)."
+      },
+      "required": true
+    },
+    {
+      "key": "connect_intro",
+      "type": "section",
+      "label": {
+        "en": "2. Connect your Google account",
+        "fr": "2. Connectez votre compte Google",
+        "de": "2. Verbinde dein Google-Konto",
+        "es": "2. Conecta tu cuenta de Google"
+      },
+      "description": {
+        "en": "Save first, then click the button. Google warns that it \"hasn’t verified this app\": it is your own app, click Advanced, then Go to (unsafe), and tick the Google Tasks permission. Connect again whenever Gladys reports a revoked access.",
+        "fr": "Enregistrez d’abord, puis cliquez sur le bouton. Google prévient qu’il « n’a pas validé cette application » : c’est votre propre application, cliquez sur Paramètres avancés puis Accéder à… (non sécurisé), et cochez l’autorisation Google Tasks. Reconnectez-vous si Gladys signale un accès révoqué.",
+        "de": "Zuerst speichern, dann auf die Schaltfläche klicken. Google warnt, dass es „diese App nicht überprüft hat“: Es ist deine eigene App. Klicke auf Erweitert, dann auf „Weiter zu … (unsicher)“ und setze das Häkchen bei der Google-Tasks-Berechtigung. Verbinde dich erneut, wenn Gladys einen widerrufenen Zugriff meldet.",
+        "es": "Guarda primero y pulsa el botón. Google avisa de que «no ha verificado esta aplicación»: es tu propia aplicación, pulsa Configuración avanzada y luego Ir a… (no seguro), y marca el permiso de Google Tasks. Vuelve a conectarte si Gladys indica un acceso revocado."
+      }
+    },
+    {
+      "key": "google_account",
+      "type": "oauth2",
+      "label": {
+        "en": "Connect with Google",
+        "fr": "Se connecter avec Google",
+        "de": "Mit Google verbinden",
+        "es": "Conectar con Google"
+      },
+      "description": {
+        "en": "Gladys only asks for the Google Tasks permission (read and change your tasks).",
+        "fr": "Gladys ne demande que l’autorisation Google Tasks (lire et modifier vos tâches).",
+        "de": "Gladys fragt nur die Google-Tasks-Berechtigung an (Aufgaben lesen und ändern).",
+        "es": "Gladys solo pide el permiso de Google Tasks (leer y modificar tus tareas)."
+      }
+    },
+    {
+      "key": "options_intro",
+      "type": "section",
+      "label": {
+        "en": "3. Options",
+        "fr": "3. Options",
+        "de": "3. Optionen",
+        "es": "3. Opciones"
+      },
+      "description": {
+        "en": "Google Tasks sends no notification: the integration reads your lists on a timer, and right after a change made from Gladys.",
+        "fr": "Google Tasks n’envoie aucune notification : l’intégration relit vos listes à intervalle régulier, et juste après une modification faite depuis Gladys.",
+        "de": "Google Tasks sendet keine Benachrichtigungen: Die Integration liest deine Listen in regelmäßigen Abständen und direkt nach einer Änderung aus Gladys.",
+        "es": "Google Tasks no envía notificaciones: la integración lee tus listas a intervalos regulares, y justo después de un cambio hecho desde Gladys."
+      }
+    },
+    {
+      "key": "poll_minutes",
+      "type": "number",
+      "label": {
+        "en": "Read Google Tasks every (minutes)",
+        "fr": "Lire Google Tasks toutes les (minutes)",
+        "de": "Google Tasks lesen alle (Minuten)",
+        "es": "Leer Google Tasks cada (minutos)"
+      },
+      "description": {
+        "en": "Each reading costs 1 request + 1 per list (Google allows 50,000 a day by default).",
+        "fr": "Chaque lecture coûte 1 requête + 1 par liste (Google en autorise 50 000 par jour par défaut).",
+        "de": "Jede Abfrage kostet 1 Anfrage + 1 pro Liste (Google erlaubt standardmäßig 50.000 pro Tag).",
+        "es": "Cada lectura cuesta 1 solicitud + 1 por lista (Google permite 50 000 al día por defecto)."
+      },
+      "min": 1,
+      "max": 60,
+      "default": 5,
+      "required": false
+    },
+    {
+      "key": "due_hour",
+      "type": "number",
+      "label": {
+        "en": "Hour of the \"task due\" trigger",
+        "fr": "Heure du déclencheur « tâche à échéance »",
+        "de": "Uhrzeit des Auslösers „Aufgabe fällig“",
+        "es": "Hora del activador «tarea vence»"
+      },
+      "description": {
+        "en": "Google stores a date without time: a task due today starts its scenes at this hour (0-23).",
+        "fr": "Google enregistre une date sans heure : une tâche due aujourd’hui lance ses scènes à cette heure (0-23).",
+        "de": "Google speichert ein Datum ohne Uhrzeit: Eine heute fällige Aufgabe startet ihre Szenen zu dieser Stunde (0-23).",
+        "es": "Google guarda una fecha sin hora: una tarea que vence hoy lanza sus escenas a esta hora (0-23)."
+      },
+      "min": 0,
+      "max": 23,
+      "default": 8,
+      "required": false
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the texts",
+        "fr": "Langue des textes",
+        "de": "Sprache der Texte",
+        "es": "Idioma de los textos"
+      },
+      "description": {
+        "en": "Feature names and scene summaries. Automatic: the language of your dashboard, once a widget has been displayed.",
+        "fr": "Noms des fonctionnalités et résumés des scènes. Automatique : la langue de votre tableau de bord, dès qu’un widget a été affiché.",
+        "de": "Namen der Funktionen und Szenenzusammenfassungen. Automatisch: die Sprache deines Dashboards, sobald ein Widget angezeigt wurde.",
+        "es": "Nombres de las funciones y resúmenes de escenas. Automático: el idioma de tu panel, en cuanto se haya mostrado un widget."
+      },
+      "options": [
+        {
+          "value": "auto",
+          "label": {
+            "en": "Automatic",
+            "fr": "Automatique",
+            "de": "Automatisch",
+            "es": "Automático"
+          }
+        },
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ],
+      "default": "auto",
+      "required": false
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Reads Google Tasks now and shows the lists, the tasks and the API calls of the day.",
+        "fr": "Lit Google Tasks maintenant et affiche les listes, les tâches et les appels API du jour.",
+        "de": "Liest Google Tasks jetzt und zeigt Listen, Aufgaben und die API-Aufrufe des Tages.",
+        "es": "Lee Google Tasks ahora y muestra las listas, las tareas y las llamadas API del día."
+      },
+      "timeout_seconds": 60
+    },
+    {
+      "key": "refresh",
+      "label": {
+        "en": "Read the lists again",
+        "fr": "Relire les listes",
+        "de": "Listen neu lesen",
+        "es": "Volver a leer las listas"
+      },
+      "description": {
+        "en": "Reads every list now and offers the new ones in Discovery.",
+        "fr": "Relit toutes les listes maintenant et propose les nouvelles dans la découverte.",
+        "de": "Liest alle Listen jetzt und bietet neue in der Geräteerkennung an.",
+        "es": "Lee todas las listas ahora y ofrece las nuevas en el descubrimiento."
+      },
+      "timeout_seconds": 60
+    },
+    {
+      "key": "diagnostic",
+      "label": {
+        "en": "Diagnostic",
+        "fr": "Diagnostic",
+        "de": "Diagnose",
+        "es": "Diagnóstico"
+      },
+      "description": {
+        "en": "Writes an anonymized summary to the logs of the integration, to attach to a bug report.",
+        "fr": "Écrit un résumé anonymisé dans les journaux de l’intégration, à joindre à un rapport de bug.",
+        "de": "Schreibt eine anonymisierte Zusammenfassung in die Protokolle der Integration, für einen Fehlerbericht.",
+        "es": "Escribe un resumen anonimizado en los registros de la integración, para adjuntar a un informe de error."
+      },
+      "timeout_seconds": 15
+    },
+    {
+      "key": "disconnect",
+      "label": {
+        "en": "Disconnect from Google",
+        "fr": "Se déconnecter de Google",
+        "de": "Von Google trennen",
+        "es": "Desconectar de Google"
+      },
+      "description": {
+        "en": "Revokes the access of Gladys and deletes the tokens. Your devices and scenes are kept.",
+        "fr": "Révoque l’accès de Gladys et supprime les jetons. Vos appareils et scènes sont conservés.",
+        "de": "Widerruft den Zugriff von Gladys und löscht die Token. Geräte und Szenen bleiben erhalten.",
+        "es": "Revoca el acceso de Gladys y borra los tokens. Tus dispositivos y escenas se conservan."
+      },
+      "timeout_seconds": 30
+    }
+  ],
+  "widgets": [
+    {
+      "key": "tasks",
+      "label": {
+        "en": "Google Tasks",
+        "fr": "Google Tasks",
+        "de": "Google Tasks",
+        "es": "Google Tasks"
+      },
+      "description": {
+        "en": "The tasks of a list, with buttons to add and complete one.",
+        "fr": "Les tâches d’une liste, avec des boutons pour en ajouter et en terminer.",
+        "de": "Die Aufgaben einer Liste, mit Schaltflächen zum Hinzufügen und Erledigen.",
+        "es": "Las tareas de una lista, con botones para añadir y completar."
+      },
+      "icon": "check-square",
+      "action_timeout_seconds": 30,
+      "settings": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for the first list (My Tasks).",
+            "fr": "Laissez vide pour la première liste (Mes tâches).",
+            "de": "Leer lassen für die erste Liste (Meine Aufgaben).",
+            "es": "Déjalo vacío para la primera lista (Mis tareas)."
+          },
+          "required": false
+        },
+        {
+          "key": "show",
+          "type": "select",
+          "label": {
+            "en": "Show",
+            "fr": "Afficher",
+            "de": "Anzeigen",
+            "es": "Mostrar"
+          },
+          "options": [
+            {
+              "value": "all",
+              "label": {
+                "en": "Every task to do",
+                "fr": "Toutes les tâches à faire",
+                "de": "Alle offenen Aufgaben",
+                "es": "Todas las tareas pendientes"
+              }
+            },
+            {
+              "value": "due",
+              "label": {
+                "en": "Due today or overdue",
+                "fr": "Pour aujourd’hui ou en retard",
+                "de": "Heute fällig oder überfällig",
+                "es": "Para hoy o atrasadas"
+              }
+            }
+          ],
+          "default": "all",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "overview",
+      "label": {
+        "en": "Task lists",
+        "fr": "Listes de tâches",
+        "de": "Aufgabenlisten",
+        "es": "Listas de tareas"
+      },
+      "description": {
+        "en": "Every Google Tasks list at a glance: to do, overdue, due today.",
+        "fr": "Toutes les listes Google Tasks d’un coup d’œil : à faire, en retard, aujourd’hui.",
+        "de": "Alle Google-Tasks-Listen auf einen Blick: offen, überfällig, heute fällig.",
+        "es": "Todas las listas de Google Tasks de un vistazo: pendientes, atrasadas, para hoy."
+      },
+      "icon": "list",
+      "action_timeout_seconds": 60
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "task_added",
+      "label": {
+        "en": "Google Tasks: task added",
+        "fr": "Google Tasks : tâche ajoutée",
+        "de": "Google Tasks: Aufgabe hinzugefügt",
+        "es": "Google Tasks: tarea añadida"
+      },
+      "description": {
+        "en": "A task appeared in a list (phone, Gmail, Calendar…). Not for the tasks added by Gladys.",
+        "fr": "Une tâche est apparue dans une liste (téléphone, Gmail, Agenda…). Pas pour celles ajoutées par Gladys.",
+        "de": "Eine Aufgabe erschien in einer Liste (Handy, Gmail, Kalender…). Nicht für von Gladys hinzugefügte.",
+        "es": "Apareció una tarea en una lista (móvil, Gmail, Calendar…). No para las añadidas por Gladys."
+      },
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for any list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für jede Liste.",
+            "es": "Déjalo vacío para cualquier lista."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "list_name",
+          "type": "string",
+          "label": {
+            "en": "List name",
+            "fr": "Nom de la liste",
+            "de": "Name der Liste",
+            "es": "Nombre de la lista"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Task title",
+            "fr": "Titre de la tâche",
+            "de": "Titel der Aufgabe",
+            "es": "Título de la tarea"
+          }
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "label": {
+            "en": "Notes",
+            "fr": "Notes",
+            "de": "Notizen",
+            "es": "Notas"
+          }
+        },
+        {
+          "key": "due",
+          "type": "string",
+          "label": {
+            "en": "Due date (YYYY-MM-DD)",
+            "fr": "Échéance (AAAA-MM-JJ)",
+            "de": "Fälligkeit (JJJJ-MM-TT)",
+            "es": "Vencimiento (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "is_subtask",
+          "type": "boolean",
+          "label": {
+            "en": "Subtask",
+            "fr": "Sous-tâche",
+            "de": "Unteraufgabe",
+            "es": "Subtarea"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "Link to the task",
+            "fr": "Lien vers la tâche",
+            "de": "Link zur Aufgabe",
+            "es": "Enlace a la tarea"
+          }
+        },
+        {
+          "key": "task_id",
+          "type": "string",
+          "label": {
+            "en": "Task ID",
+            "fr": "Identifiant de la tâche",
+            "de": "Aufgaben-ID",
+            "es": "ID de la tarea"
+          }
+        }
+      ]
+    },
+    {
+      "key": "task_completed",
+      "label": {
+        "en": "Google Tasks: task completed",
+        "fr": "Google Tasks : tâche terminée",
+        "de": "Google Tasks: Aufgabe erledigt",
+        "es": "Google Tasks: tarea completada"
+      },
+      "description": {
+        "en": "A task was marked completed outside Gladys.",
+        "fr": "Une tâche a été marquée terminée en dehors de Gladys.",
+        "de": "Eine Aufgabe wurde außerhalb von Gladys als erledigt markiert.",
+        "es": "Una tarea se marcó como completada fuera de Gladys."
+      },
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for any list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für jede Liste.",
+            "es": "Déjalo vacío para cualquier lista."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "list_name",
+          "type": "string",
+          "label": {
+            "en": "List name",
+            "fr": "Nom de la liste",
+            "de": "Name der Liste",
+            "es": "Nombre de la lista"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Task title",
+            "fr": "Titre de la tâche",
+            "de": "Titel der Aufgabe",
+            "es": "Título de la tarea"
+          }
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "label": {
+            "en": "Notes",
+            "fr": "Notes",
+            "de": "Notizen",
+            "es": "Notas"
+          }
+        },
+        {
+          "key": "due",
+          "type": "string",
+          "label": {
+            "en": "Due date (YYYY-MM-DD)",
+            "fr": "Échéance (AAAA-MM-JJ)",
+            "de": "Fälligkeit (JJJJ-MM-TT)",
+            "es": "Vencimiento (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "is_subtask",
+          "type": "boolean",
+          "label": {
+            "en": "Subtask",
+            "fr": "Sous-tâche",
+            "de": "Unteraufgabe",
+            "es": "Subtarea"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "Link to the task",
+            "fr": "Lien vers la tâche",
+            "de": "Link zur Aufgabe",
+            "es": "Enlace a la tarea"
+          }
+        },
+        {
+          "key": "task_id",
+          "type": "string",
+          "label": {
+            "en": "Task ID",
+            "fr": "Identifiant de la tâche",
+            "de": "Aufgaben-ID",
+            "es": "ID de la tarea"
+          }
+        }
+      ]
+    },
+    {
+      "key": "task_due",
+      "label": {
+        "en": "Google Tasks: task due today",
+        "fr": "Google Tasks : tâche à échéance",
+        "de": "Google Tasks: Aufgabe heute fällig",
+        "es": "Google Tasks: tarea vence hoy"
+      },
+      "description": {
+        "en": "A task still to do is due today: fires at the hour set in the configuration.",
+        "fr": "Une tâche encore à faire arrive à échéance aujourd’hui : se déclenche à l’heure réglée dans la configuration.",
+        "de": "Eine offene Aufgabe ist heute fällig: wird zur in der Konfiguration eingestellten Stunde ausgelöst.",
+        "es": "Una tarea pendiente vence hoy: se activa a la hora ajustada en la configuración."
+      },
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for any list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für jede Liste.",
+            "es": "Déjalo vacío para cualquier lista."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "list_name",
+          "type": "string",
+          "label": {
+            "en": "List name",
+            "fr": "Nom de la liste",
+            "de": "Name der Liste",
+            "es": "Nombre de la lista"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Task title",
+            "fr": "Titre de la tâche",
+            "de": "Titel der Aufgabe",
+            "es": "Título de la tarea"
+          }
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "label": {
+            "en": "Notes",
+            "fr": "Notes",
+            "de": "Notizen",
+            "es": "Notas"
+          }
+        },
+        {
+          "key": "due",
+          "type": "string",
+          "label": {
+            "en": "Due date (YYYY-MM-DD)",
+            "fr": "Échéance (AAAA-MM-JJ)",
+            "de": "Fälligkeit (JJJJ-MM-TT)",
+            "es": "Vencimiento (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "is_subtask",
+          "type": "boolean",
+          "label": {
+            "en": "Subtask",
+            "fr": "Sous-tâche",
+            "de": "Unteraufgabe",
+            "es": "Subtarea"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "Link to the task",
+            "fr": "Lien vers la tâche",
+            "de": "Link zur Aufgabe",
+            "es": "Enlace a la tarea"
+          }
+        },
+        {
+          "key": "task_id",
+          "type": "string",
+          "label": {
+            "en": "Task ID",
+            "fr": "Identifiant de la tâche",
+            "de": "Aufgaben-ID",
+            "es": "ID de la tarea"
+          }
+        }
+      ]
+    },
+    {
+      "key": "task_overdue",
+      "label": {
+        "en": "Google Tasks: task overdue",
+        "fr": "Google Tasks : tâche en retard",
+        "de": "Google Tasks: Aufgabe überfällig",
+        "es": "Google Tasks: tarea atrasada"
+      },
+      "description": {
+        "en": "A task still to do went past its due date (just after midnight).",
+        "fr": "Une tâche encore à faire a dépassé son échéance (juste après minuit).",
+        "de": "Eine offene Aufgabe hat ihr Fälligkeitsdatum überschritten (kurz nach Mitternacht).",
+        "es": "Una tarea pendiente superó su fecha de vencimiento (justo después de medianoche)."
+      },
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for any list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für jede Liste.",
+            "es": "Déjalo vacío para cualquier lista."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "list_name",
+          "type": "string",
+          "label": {
+            "en": "List name",
+            "fr": "Nom de la liste",
+            "de": "Name der Liste",
+            "es": "Nombre de la lista"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Task title",
+            "fr": "Titre de la tâche",
+            "de": "Titel der Aufgabe",
+            "es": "Título de la tarea"
+          }
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "label": {
+            "en": "Notes",
+            "fr": "Notes",
+            "de": "Notizen",
+            "es": "Notas"
+          }
+        },
+        {
+          "key": "due",
+          "type": "string",
+          "label": {
+            "en": "Due date (YYYY-MM-DD)",
+            "fr": "Échéance (AAAA-MM-JJ)",
+            "de": "Fälligkeit (JJJJ-MM-TT)",
+            "es": "Vencimiento (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "is_subtask",
+          "type": "boolean",
+          "label": {
+            "en": "Subtask",
+            "fr": "Sous-tâche",
+            "de": "Unteraufgabe",
+            "es": "Subtarea"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "Link to the task",
+            "fr": "Lien vers la tâche",
+            "de": "Link zur Aufgabe",
+            "es": "Enlace a la tarea"
+          }
+        },
+        {
+          "key": "task_id",
+          "type": "string",
+          "label": {
+            "en": "Task ID",
+            "fr": "Identifiant de la tâche",
+            "de": "Aufgaben-ID",
+            "es": "ID de la tarea"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "add_task",
+      "label": {
+        "en": "Google Tasks: add a task",
+        "fr": "Google Tasks : ajouter une tâche",
+        "de": "Google Tasks: Aufgabe hinzufügen",
+        "es": "Google Tasks: añadir una tarea"
+      },
+      "description": {
+        "en": "Creates a task, with notes and a due date.",
+        "fr": "Crée une tâche, avec des notes et une échéance.",
+        "de": "Erstellt eine Aufgabe mit Notizen und Fälligkeitsdatum.",
+        "es": "Crea una tarea, con notas y fecha de vencimiento."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for the first list (My Tasks).",
+            "fr": "Laissez vide pour la première liste (Mes tâches).",
+            "de": "Leer lassen für die erste Liste (Meine Aufgaben).",
+            "es": "Déjalo vacío para la primera lista (Mis tareas)."
+          },
+          "required": false
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          },
+          "description": {
+            "en": "Scene variables are allowed.",
+            "fr": "Les variables de scène sont acceptées.",
+            "de": "Szenenvariablen sind erlaubt.",
+            "es": "Se admiten variables de escena."
+          },
+          "required": true
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "label": {
+            "en": "Notes",
+            "fr": "Notes",
+            "de": "Notizen",
+            "es": "Notas"
+          },
+          "required": false
+        },
+        {
+          "key": "when",
+          "type": "select",
+          "label": {
+            "en": "Due",
+            "fr": "Échéance",
+            "de": "Fällig",
+            "es": "Vencimiento"
+          },
+          "options": [
+            {
+              "value": "none",
+              "label": {
+                "en": "No date",
+                "fr": "Sans date",
+                "de": "Kein Datum",
+                "es": "Sin fecha"
+              }
+            },
+            {
+              "value": "today",
+              "label": {
+                "en": "Today",
+                "fr": "Aujourd’hui",
+                "de": "Heute",
+                "es": "Hoy"
+              }
+            },
+            {
+              "value": "tomorrow",
+              "label": {
+                "en": "Tomorrow",
+                "fr": "Demain",
+                "de": "Morgen",
+                "es": "Mañana"
+              }
+            },
+            {
+              "value": "next_week",
+              "label": {
+                "en": "In a week",
+                "fr": "Dans une semaine",
+                "de": "In einer Woche",
+                "es": "En una semana"
+              }
+            },
+            {
+              "value": "date",
+              "label": {
+                "en": "Other date",
+                "fr": "Autre date",
+                "de": "Anderes Datum",
+                "es": "Otra fecha"
+              }
+            }
+          ],
+          "default": "none",
+          "required": false
+        },
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Other date",
+            "fr": "Autre date",
+            "de": "Anderes Datum",
+            "es": "Otra fecha"
+          },
+          "description": {
+            "en": "With \"Other date\": YYYY-MM-DD, DD/MM/YYYY or +3 (days). Google keeps the date only.",
+            "fr": "Avec « Autre date » : AAAA-MM-JJ, JJ/MM/AAAA ou +3 (jours). Google ne garde que la date.",
+            "de": "Mit „Anderes Datum“: JJJJ-MM-TT, TT/MM/JJJJ oder +3 (Tage). Google speichert nur das Datum.",
+            "es": "Con «Otra fecha»: AAAA-MM-DD, DD/MM/AAAA o +3 (días). Google solo guarda la fecha."
+          },
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "key": "task_id",
+          "type": "string",
+          "label": {
+            "en": "Task ID",
+            "fr": "Identifiant de la tâche",
+            "de": "Aufgaben-ID",
+            "es": "ID de la tarea"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
+        },
+        {
+          "key": "due",
+          "type": "string",
+          "label": {
+            "en": "Due date (YYYY-MM-DD)",
+            "fr": "Échéance (AAAA-MM-JJ)",
+            "de": "Fälligkeit (JJJJ-MM-TT)",
+            "es": "Vencimiento (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "Link to the task",
+            "fr": "Lien vers la tâche",
+            "de": "Link zur Aufgabe",
+            "es": "Enlace a la tarea"
+          }
+        }
+      ]
+    },
+    {
+      "key": "complete_task",
+      "label": {
+        "en": "Google Tasks: complete a task",
+        "fr": "Google Tasks : terminer une tâche",
+        "de": "Google Tasks: Aufgabe erledigen",
+        "es": "Google Tasks: completar una tarea"
+      },
+      "description": {
+        "en": "Marks completed the first task to do whose title matches (exact, then contains).",
+        "fr": "Marque terminée la première tâche à faire dont le titre correspond (exact, puis contient).",
+        "de": "Markiert die erste offene Aufgabe mit passendem Titel als erledigt (exakt, dann enthält).",
+        "es": "Marca como completada la primera tarea pendiente cuyo título coincida (exacto, luego contiene)."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for any list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für jede Liste.",
+            "es": "Déjalo vacío para cualquier lista."
+          },
+          "required": false
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          },
+          "description": {
+            "en": "Case and accents are ignored.",
+            "fr": "La casse et les accents sont ignorés.",
+            "de": "Groß-/Kleinschreibung und Akzente werden ignoriert.",
+            "es": "Se ignoran mayúsculas y acentos."
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "completed",
+          "type": "boolean",
+          "label": {
+            "en": "A task was completed",
+            "fr": "Une tâche a été terminée",
+            "de": "Eine Aufgabe wurde erledigt",
+            "es": "Se completó una tarea"
+          }
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
+        },
+        {
+          "key": "list_name",
+          "type": "string",
+          "label": {
+            "en": "List name",
+            "fr": "Nom de la liste",
+            "de": "Name der Liste",
+            "es": "Nombre de la lista"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_tasks",
+      "label": {
+        "en": "Google Tasks: read the tasks",
+        "fr": "Google Tasks : lire les tâches",
+        "de": "Google Tasks: Aufgaben lesen",
+        "es": "Google Tasks: leer las tareas"
+      },
+      "description": {
+        "en": "The tasks to do from the last reading, for a message or a condition.",
+        "fr": "Les tâches à faire de la dernière lecture, pour un message ou une condition.",
+        "de": "Die offenen Aufgaben der letzten Abfrage, für eine Nachricht oder Bedingung.",
+        "es": "Las tareas pendientes de la última lectura, para un mensaje o una condición."
+      },
+      "timeout_seconds": 15,
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for any list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für jede Liste.",
+            "es": "Déjalo vacío para cualquier lista."
+          },
+          "required": false
+        },
+        {
+          "key": "scope",
+          "type": "select",
+          "label": {
+            "en": "Tasks",
+            "fr": "Tâches",
+            "de": "Aufgaben",
+            "es": "Tareas"
+          },
+          "options": [
+            {
+              "value": "all",
+              "label": {
+                "en": "Every task to do",
+                "fr": "Toutes les tâches à faire",
+                "de": "Alle offenen Aufgaben",
+                "es": "Todas las pendientes"
+              }
+            },
+            {
+              "value": "due",
+              "label": {
+                "en": "Due today or overdue",
+                "fr": "Pour aujourd’hui ou en retard",
+                "de": "Heute fällig oder überfällig",
+                "es": "Para hoy o atrasadas"
+              }
+            },
+            {
+              "value": "today",
+              "label": {
+                "en": "Due today",
+                "fr": "Pour aujourd’hui",
+                "de": "Heute fällig",
+                "es": "Para hoy"
+              }
+            },
+            {
+              "value": "overdue",
+              "label": {
+                "en": "Overdue",
+                "fr": "En retard",
+                "de": "Überfällig",
+                "es": "Atrasadas"
+              }
+            }
+          ],
+          "default": "all",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "key": "count",
+          "type": "number",
+          "label": {
+            "en": "Number of tasks",
+            "fr": "Nombre de tâches",
+            "de": "Anzahl der Aufgaben",
+            "es": "Número de tareas"
+          }
+        },
+        {
+          "key": "overdue_count",
+          "type": "number",
+          "label": {
+            "en": "Overdue",
+            "fr": "En retard",
+            "de": "Überfällig",
+            "es": "Atrasadas"
+          }
+        },
+        {
+          "key": "today_count",
+          "type": "number",
+          "label": {
+            "en": "Due today",
+            "fr": "Pour aujourd’hui",
+            "de": "Heute fällig",
+            "es": "Para hoy"
+          }
+        },
+        {
+          "key": "titles",
+          "type": "string",
+          "label": {
+            "en": "Titles",
+            "fr": "Titres",
+            "de": "Titel",
+            "es": "Títulos"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary",
+            "fr": "Résumé",
+            "de": "Zusammenfassung",
+            "es": "Resumen"
+          }
+        },
+        {
+          "key": "next_title",
+          "type": "string",
+          "label": {
+            "en": "Next task",
+            "fr": "Prochaine tâche",
+            "de": "Nächste Aufgabe",
+            "es": "Próxima tarea"
+          }
+        },
+        {
+          "key": "next_due",
+          "type": "string",
+          "label": {
+            "en": "Its due date",
+            "fr": "Son échéance",
+            "de": "Ihre Fälligkeit",
+            "es": "Su vencimiento"
+          }
+        }
+      ]
+    },
+    {
+      "key": "clear_completed",
+      "label": {
+        "en": "Google Tasks: clear completed tasks",
+        "fr": "Google Tasks : effacer les tâches terminées",
+        "de": "Google Tasks: erledigte Aufgaben löschen",
+        "es": "Google Tasks: borrar tareas completadas"
+      },
+      "description": {
+        "en": "Hides the completed tasks of a list, as \"Delete all completed tasks\" in the app.",
+        "fr": "Masque les tâches terminées d’une liste, comme « Supprimer toutes les tâches terminées » dans l’app.",
+        "de": "Blendet die erledigten Aufgaben einer Liste aus, wie „Alle erledigten Aufgaben löschen“ in der App.",
+        "es": "Oculta las tareas completadas de una lista, como «Eliminar todas las tareas completadas» en la app."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "list",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Task list",
+            "fr": "Liste de tâches",
+            "de": "Aufgabenliste",
+            "es": "Lista de tareas"
+          },
+          "description": {
+            "en": "Leave empty for every list.",
+            "fr": "Laissez vide pour toutes les listes.",
+            "de": "Leer lassen für alle Listen.",
+            "es": "Déjalo vacío para todas las listas."
+          },
+          "required": false
+        }
+      ]
+    }
+  ]
+}
