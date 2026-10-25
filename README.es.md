@@ -5,7 +5,7 @@
 [![Licencia: Apache-2.0](https://img.shields.io/badge/licencia-Apache--2.0-blue.svg)](LICENSE)
 [![Última versión](https://img.shields.io/github/v/release/William-De71/gladys-google-tasks?sort=semver)](https://github.com/William-De71/gladys-google-tasks/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/William-De71/gladys-google-tasks/release.yml?branch=main&label=CI)](https://github.com/William-De71/gladys-google-tasks/actions/workflows/release.yml)
-[![Gladys](https://img.shields.io/badge/Gladys-%E2%89%A5%205.2.0-2f6fb5)](https://gladysassistant.com)
+[![Gladys](https://img.shields.io/badge/Gladys-%E2%89%A5%205.3.0-2f6fb5)](https://gladysassistant.com)
 
 ![Google Tasks para Gladys Assistant](cover.jpg)
 
@@ -86,7 +86,7 @@ No implementado: editar, mover (`tasks.move`) o eliminar una tarea, crear subtar
 
 ## Requisitos
 
-- Gladys **5.2.0** o posterior (las versiones anteriores no pueden instalar la integración: formularios de los widgets, widgets y escenas).
+- Gladys **5.3.0** o posterior (las versiones anteriores no pueden instalar la integración: formularios de los widgets, widgets y escenas, palabras clave del catálogo de Gladys 5.3).
 - Una cuenta de Google que use Google Tasks.
 - Un proyecto gratuito de Google Cloud con la API de Google Tasks habilitada, una pantalla de consentimiento **En producción** y un cliente OAuth de tipo **Aplicación web** cuyo URI de redireccionamiento sea `https://my.gladysassistant.com/redirect/oauth` (paso a paso en la [documentación](docs/es.md#configuración)).
 

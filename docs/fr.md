@@ -14,7 +14,7 @@ Cette intégration amène vos listes **Google Tasks** dans Gladys : un appareil 
 
 ## Prérequis
 
-- Gladys **5.2.0** ou plus récent (formulaires des widgets).
+- Gladys **5.3.0** ou plus récent (formulaires des widgets).
 - Un compte Google (personnel ou Workspace) qui utilise Google Tasks.
 - Un **projet Google Cloud** gratuit dans lequel vous créez **votre propre client OAuth** : Google ne permet pas de partager une clé, et l’intégration n’en embarque aucune. Comptez une dizaine de minutes, une seule fois.
 

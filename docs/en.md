@@ -14,7 +14,7 @@ This integration brings your **Google Tasks** lists into Gladys: one device per 
 
 ## Requirements
 
-- Gladys **5.2.0** or later (widget forms).
+- Gladys **5.3.0** or later (widget forms).
 - A Google account (personal or Workspace) using Google Tasks.
 - A free **Google Cloud project** in which you create **your own OAuth client**: Google does not allow sharing a key, and the integration ships none. Count about ten minutes, once.
 
